@@ -1,7 +1,50 @@
-import { app, Tray, Menu, ipcMain, nativeImage } from 'electron';
+import { app, Tray, Menu, BrowserWindow, ipcMain, nativeImage, shell } from 'electron';
 import path from 'node:path';
+import { store } from './store';
+import { registerIpcHandlers } from './ipc';
 
 let tray: Tray | null = null;
+let preferencesWindow: BrowserWindow | null = null;
+
+function createPreferencesWindow(): void {
+  if (preferencesWindow) {
+    preferencesWindow.show();
+    preferencesWindow.focus();
+    return;
+  }
+
+  preferencesWindow = new BrowserWindow({
+    width: 520,
+    height: 480,
+    show: false,
+    resizable: false,
+    titleBarStyle: 'hiddenInset',
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/index.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  if (process.env.NODE_ENV === 'development') {
+    preferencesWindow.loadURL('http://localhost:9000');
+  } else {
+    preferencesWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+  }
+
+  preferencesWindow.once('ready-to-show', () => {
+    preferencesWindow?.show();
+  });
+
+  preferencesWindow.on('closed', () => {
+    preferencesWindow = null;
+  });
+
+  preferencesWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+}
 
 function createTray(): void {
   const iconPath = path.join(__dirname, '../../assets/trayTemplate.png');
@@ -23,7 +66,7 @@ function createTray(): void {
     {
       label: 'Preferences...',
       click: () => {
-        // no-op for now
+        createPreferencesWindow();
       },
     },
     {
@@ -42,11 +85,17 @@ app.whenReady().then(() => {
     app.dock.hide();
   }
 
-  createTray();
+  registerIpcHandlers();
 
   ipcMain.handle('get-app-version', () => {
     return app.getVersion();
   });
+
+  createTray();
+
+  if (!store.get('setupComplete')) {
+    createPreferencesWindow();
+  }
 });
 
 app.on('window-all-closed', () => {

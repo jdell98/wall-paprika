@@ -1,5 +1,43 @@
+export interface Collection {
+  id: string;
+  title: string;
+  totalPhotos: number;
+  coverUrl: string | null;
+}
+
+export interface PhotoMeta {
+  id: string;
+  url: string;
+  downloadLocation: string;
+  photographerName: string;
+  photographerUrl: string;
+  unsplashUrl: string;
+  description: string | null;
+}
+
+export interface RotationInterval {
+  value: number;
+  unit: 'minutes' | 'hours' | 'days' | 'weeks' | 'months' | 'years';
+}
+
+export interface Settings {
+  apiKeyMasked: string | null;
+  collections: Collection[];
+  rotationInterval: RotationInterval;
+  hotkey: string | null;
+  launchAtLogin: boolean;
+  paused: boolean;
+  currentPhoto: PhotoMeta | null;
+  setupComplete: boolean;
+}
+
 export interface WallPaprikaAPI {
   getAppVersion: () => Promise<string>;
+  getSettings: () => Promise<Settings>;
+  setApiKey: (key: string) => Promise<void>;
+  validateApiKey: (key: string) => Promise<{ valid: boolean; error?: string }>;
+  setSetupComplete: () => Promise<void>;
+  getSetupComplete: () => Promise<boolean>;
 }
 
 declare global {
