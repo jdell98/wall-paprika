@@ -51,6 +51,9 @@ export interface WallPaprikaAPI {
   setRotationInterval: (interval: RotationInterval) => Promise<void>;
   setPaused: (paused: boolean) => Promise<void>;
   getRotationStatus: () => Promise<RotationStatus>;
+  setHotkey: (accelerator: string) => Promise<{ success: boolean; error?: string }>;
+  clearHotkey: () => Promise<void>;
+  getHotkey: () => Promise<string | null>;
 }
 
 declare global {

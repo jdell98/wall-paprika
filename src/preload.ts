@@ -15,6 +15,9 @@ const api: WallPaprikaAPI = {
   setRotationInterval: (interval) => ipcRenderer.invoke('set-rotation-interval', interval),
   setPaused: (paused) => ipcRenderer.invoke('set-paused', paused),
   getRotationStatus: () => ipcRenderer.invoke('get-rotation-status'),
+  setHotkey: (accelerator) => ipcRenderer.invoke('set-hotkey', accelerator),
+  clearHotkey: () => ipcRenderer.invoke('clear-hotkey'),
+  getHotkey: () => ipcRenderer.invoke('get-hotkey'),
 };
 
 contextBridge.exposeInMainWorld('api', api);

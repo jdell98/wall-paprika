@@ -9,6 +9,7 @@ import {
   RateLimitError,
 } from './unsplash';
 import { prefetchCollectionPhotos, removeCollectionPhotos } from './photo-pool';
+import { shortcutManager } from './shortcuts';
 import type { Collection, RotationInterval, RotationStatus, Settings } from '../shared/types';
 
 export function registerIpcHandlers(): void {
@@ -147,5 +148,24 @@ export function registerIpcHandlers(): void {
       interval: store.get('rotationInterval'),
       lastRotation: store.get('lastRotationTimestamp'),
     };
+  });
+
+  ipcMain.handle(
+    'set-hotkey',
+    (_event, accelerator: string): { success: boolean; error?: string } => {
+      const success = shortcutManager.update(accelerator);
+      if (!success) {
+        return { success: false, error: 'Shortcut is already in use by another application' };
+      }
+      return { success: true };
+    },
+  );
+
+  ipcMain.handle('clear-hotkey', (): void => {
+    shortcutManager.update(null);
+  });
+
+  ipcMain.handle('get-hotkey', (): string | null => {
+    return store.get('hotkey');
   });
 }

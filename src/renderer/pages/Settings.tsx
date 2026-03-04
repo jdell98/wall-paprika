@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { RotationInterval, RotationStatus } from '../../shared/types';
+import { HotkeyRecorder } from '../components/HotkeyRecorder';
 
 const units: { value: RotationInterval['unit']; label: string }[] = [
   { value: 'minutes', label: 'Minutes' },
@@ -27,13 +28,18 @@ export default function Settings() {
   const [intervalValue, setIntervalValue] = useState(1);
   const [intervalUnit, setIntervalUnit] = useState<RotationInterval['unit']>('hours');
   const [paused, setPaused] = useState(false);
+  const [hotkey, setHotkey] = useState<string | null>(null);
 
   const loadStatus = async () => {
-    const s = await window.api.getRotationStatus();
+    const [s, hk] = await Promise.all([
+      window.api.getRotationStatus(),
+      window.api.getHotkey(),
+    ]);
     setStatus(s);
     setIntervalValue(s.interval.value);
     setIntervalUnit(s.interval.unit);
     setPaused(s.paused);
+    setHotkey(hk);
   };
 
   useEffect(() => {
@@ -110,6 +116,15 @@ export default function Settings() {
             }`}
           />
         </button>
+      </div>
+
+      {/* Keyboard Shortcut */}
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-900">Keyboard shortcut</label>
+        <p className="mb-2 text-xs text-gray-500">
+          Press a key combination to quickly change your wallpaper from anywhere.
+        </p>
+        <HotkeyRecorder value={hotkey} onChange={setHotkey} />
       </div>
 
       {/* Status */}

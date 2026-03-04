@@ -5,6 +5,7 @@ import { registerIpcHandlers } from './ipc';
 import { rotateWallpaper } from './rotation';
 import { ensureBatchDir, fillBatch, getBatchCount } from './batch-manager';
 import { scheduler } from './scheduler';
+import { shortcutManager } from './shortcuts';
 
 let tray: Tray | null = null;
 let preferencesWindow: BrowserWindow | null = null;
@@ -142,6 +143,9 @@ async function onStartup(): Promise<void> {
     }
   }
 
+  // Register global hotkey
+  shortcutManager.register();
+
   // Start the scheduler
   scheduler.handleResume();
 
@@ -180,6 +184,10 @@ app.whenReady().then(() => {
   onStartup().catch((err) => {
     console.error('[startup] Error during initialization:', err);
   });
+});
+
+app.on('will-quit', () => {
+  shortcutManager.unregister();
 });
 
 app.on('window-all-closed', () => {
