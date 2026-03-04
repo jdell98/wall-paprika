@@ -9,7 +9,7 @@ import {
   RateLimitError,
 } from './unsplash';
 import { prefetchCollectionPhotos, removeCollectionPhotos } from './photo-pool';
-import type { Collection, Settings } from '../shared/types';
+import type { Collection, RotationInterval, RotationStatus, Settings } from '../shared/types';
 
 export function registerIpcHandlers(): void {
   ipcMain.handle('get-settings', (): Settings => {
@@ -131,5 +131,21 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('get-total-photos', (): number => {
     const collections = store.get('collections');
     return collections.reduce((sum, c) => sum + c.totalPhotos, 0);
+  });
+
+  ipcMain.handle('set-rotation-interval', (_event, interval: RotationInterval): void => {
+    store.set('rotationInterval', interval);
+  });
+
+  ipcMain.handle('set-paused', (_event, paused: boolean): void => {
+    store.set('paused', paused);
+  });
+
+  ipcMain.handle('get-rotation-status', (): RotationStatus => {
+    return {
+      paused: store.get('paused'),
+      interval: store.get('rotationInterval'),
+      lastRotation: store.get('lastRotationTimestamp'),
+    };
   });
 }

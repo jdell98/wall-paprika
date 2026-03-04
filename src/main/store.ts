@@ -11,6 +11,7 @@ interface StoreSchema {
   paused: boolean;
   currentPhoto: PhotoMeta | null;
   currentWallpaperPath: string | null;
+  lastRotationTimestamp: number | null;
   shownPhotoIds: string[];
   prefetchedPhotos: PhotoMeta[];
   setupComplete: boolean;
@@ -27,6 +28,7 @@ export const store = new Store<StoreSchema>({
     paused: false,
     currentPhoto: null,
     currentWallpaperPath: null,
+    lastRotationTimestamp: null,
     shownPhotoIds: [],
     prefetchedPhotos: [],
     setupComplete: false,

@@ -12,6 +12,9 @@ const api: WallPaprikaAPI = {
   removeCollection: (id: string) => ipcRenderer.invoke('remove-collection', id),
   getCollections: () => ipcRenderer.invoke('get-collections'),
   getTotalPhotos: () => ipcRenderer.invoke('get-total-photos'),
+  setRotationInterval: (interval) => ipcRenderer.invoke('set-rotation-interval', interval),
+  setPaused: (paused) => ipcRenderer.invoke('set-paused', paused),
+  getRotationStatus: () => ipcRenderer.invoke('get-rotation-status'),
 };
 
 contextBridge.exposeInMainWorld('api', api);

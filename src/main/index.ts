@@ -1,9 +1,10 @@
-import { app, Tray, Menu, BrowserWindow, ipcMain, nativeImage, shell } from 'electron';
+import { app, Tray, Menu, BrowserWindow, ipcMain, nativeImage, shell, powerMonitor } from 'electron';
 import path from 'node:path';
 import { store } from './store';
 import { registerIpcHandlers } from './ipc';
 import { rotateWallpaper } from './rotation';
 import { ensureBatchDir, fillBatch, getBatchCount } from './batch-manager';
+import { scheduler } from './scheduler';
 
 let tray: Tray | null = null;
 let preferencesWindow: BrowserWindow | null = null;
@@ -136,9 +137,31 @@ async function onStartup(): Promise<void> {
   if (!store.get('currentWallpaperPath')) {
     const success = await rotateWallpaper();
     if (success) {
+      store.set('lastRotationTimestamp', Date.now());
       updateTrayMenu();
     }
   }
+
+  // Start the scheduler
+  scheduler.handleResume();
+
+  // React to store changes
+  store.onDidChange('rotationInterval', () => {
+    scheduler.restart();
+  });
+
+  store.onDidChange('paused', (paused) => {
+    if (paused) {
+      scheduler.stop();
+    } else {
+      scheduler.start();
+    }
+  });
+
+  // Handle wake from sleep
+  powerMonitor.on('resume', () => {
+    scheduler.handleResume();
+  });
 }
 
 app.whenReady().then(() => {

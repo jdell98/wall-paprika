@@ -31,6 +31,12 @@ export interface Settings {
   setupComplete: boolean;
 }
 
+export interface RotationStatus {
+  paused: boolean;
+  interval: RotationInterval;
+  lastRotation: number | null;
+}
+
 export interface WallPaprikaAPI {
   getAppVersion: () => Promise<string>;
   getSettings: () => Promise<Settings>;
@@ -42,6 +48,9 @@ export interface WallPaprikaAPI {
   removeCollection: (id: string) => Promise<void>;
   getCollections: () => Promise<Collection[]>;
   getTotalPhotos: () => Promise<number>;
+  setRotationInterval: (interval: RotationInterval) => Promise<void>;
+  setPaused: (paused: boolean) => Promise<void>;
+  getRotationStatus: () => Promise<RotationStatus>;
 }
 
 declare global {
