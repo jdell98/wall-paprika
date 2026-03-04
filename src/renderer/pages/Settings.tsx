@@ -29,17 +29,20 @@ export default function Settings() {
   const [intervalUnit, setIntervalUnit] = useState<RotationInterval['unit']>('hours');
   const [paused, setPaused] = useState(false);
   const [hotkey, setHotkey] = useState<string | null>(null);
+  const [launchAtLogin, setLaunchAtLogin] = useState(false);
 
   const loadStatus = async () => {
-    const [s, hk] = await Promise.all([
+    const [s, hk, login] = await Promise.all([
       window.api.getRotationStatus(),
       window.api.getHotkey(),
+      window.api.getLaunchAtLogin(),
     ]);
     setStatus(s);
     setIntervalValue(s.interval.value);
     setIntervalUnit(s.interval.unit);
     setPaused(s.paused);
     setHotkey(hk);
+    setLaunchAtLogin(login);
   };
 
   useEffect(() => {
@@ -113,6 +116,30 @@ export default function Settings() {
           <span
             className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
               paused ? 'translate-x-1' : 'translate-x-6'
+            }`}
+          />
+        </button>
+      </div>
+
+      {/* Launch at Login */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-900">Launch at login</p>
+          <p className="text-xs text-gray-500">Start Wall Paprika when you log in</p>
+        </div>
+        <button
+          onClick={async () => {
+            const newValue = !launchAtLogin;
+            setLaunchAtLogin(newValue);
+            await window.api.setLaunchAtLogin(newValue);
+          }}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+            launchAtLogin ? 'bg-orange-600' : 'bg-gray-300'
+          }`}
+        >
+          <span
+            className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+              launchAtLogin ? 'translate-x-6' : 'translate-x-1'
             }`}
           />
         </button>

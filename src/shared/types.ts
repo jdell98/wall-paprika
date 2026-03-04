@@ -37,6 +37,11 @@ export interface RotationStatus {
   lastRotation: number | null;
 }
 
+export interface RateLimitInfo {
+  remaining: number;
+  limit: number;
+}
+
 export interface WallPaprikaAPI {
   getAppVersion: () => Promise<string>;
   getSettings: () => Promise<Settings>;
@@ -54,6 +59,10 @@ export interface WallPaprikaAPI {
   setHotkey: (accelerator: string) => Promise<{ success: boolean; error?: string }>;
   clearHotkey: () => Promise<void>;
   getHotkey: () => Promise<string | null>;
+  setLaunchAtLogin: (enabled: boolean) => Promise<void>;
+  getLaunchAtLogin: () => Promise<boolean>;
+  getRateLimit: () => Promise<RateLimitInfo>;
+  validateCurrentKey: () => Promise<{ valid: boolean; error?: string }>;
 }
 
 declare global {

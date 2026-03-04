@@ -18,8 +18,8 @@ function createPreferencesWindow(): void {
   }
 
   preferencesWindow = new BrowserWindow({
-    width: 520,
-    height: 480,
+    width: 560,
+    height: 520,
     show: false,
     resizable: false,
     titleBarStyle: 'hiddenInset',
@@ -55,9 +55,14 @@ function buildTrayMenu(): Menu {
   const collections = store.get('collections');
   const hasCollections = collections.length > 0;
 
-  const currentLabel = currentPhoto
-    ? `Current: "${currentPhoto.description || 'Untitled'}" by ${currentPhoto.photographerName}`
-    : 'Current: No wallpaper set';
+  let currentLabel: string;
+  if (currentPhoto) {
+    currentLabel = `Current: "${currentPhoto.description || 'Untitled'}" by ${currentPhoto.photographerName}`;
+  } else if (!hasCollections) {
+    currentLabel = 'Current: Add collections in Preferences';
+  } else {
+    currentLabel = 'Current: No wallpaper set';
+  }
 
   const menuItems: Electron.MenuItemConstructorOptions[] = [
     {

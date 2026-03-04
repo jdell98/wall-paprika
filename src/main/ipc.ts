@@ -1,16 +1,23 @@
-import { ipcMain } from 'electron';
+import { app, ipcMain } from 'electron';
 import { store, getApiKey, setApiKey, getMaskedApiKey } from './store';
 import {
   validateKey,
   parseCollectionUrl,
   getCollection,
   getCollectionPhotos,
+  getRateLimit,
   InvalidKeyError,
   RateLimitError,
 } from './unsplash';
 import { prefetchCollectionPhotos, removeCollectionPhotos } from './photo-pool';
 import { shortcutManager } from './shortcuts';
-import type { Collection, RotationInterval, RotationStatus, Settings } from '../shared/types';
+import type {
+  Collection,
+  RateLimitInfo,
+  RotationInterval,
+  RotationStatus,
+  Settings,
+} from '../shared/types';
 
 export function registerIpcHandlers(): void {
   ipcMain.handle('get-settings', (): Settings => {
@@ -168,4 +175,39 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('get-hotkey', (): string | null => {
     return store.get('hotkey');
   });
+
+  ipcMain.handle('set-launch-at-login', (_event, enabled: boolean): void => {
+    app.setLoginItemSettings({ openAtLogin: enabled });
+    store.set('launchAtLogin', enabled);
+  });
+
+  ipcMain.handle('get-launch-at-login', (): boolean => {
+    return app.getLoginItemSettings().openAtLogin;
+  });
+
+  ipcMain.handle('get-rate-limit', (): RateLimitInfo => {
+    return getRateLimit();
+  });
+
+  ipcMain.handle(
+    'validate-current-key',
+    async (): Promise<{ valid: boolean; error?: string }> => {
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        return { valid: false, error: 'No API key configured' };
+      }
+      try {
+        const valid = await validateKey(apiKey);
+        return { valid };
+      } catch (error) {
+        if (error instanceof InvalidKeyError) {
+          return { valid: false, error: 'Invalid API key' };
+        }
+        if (error instanceof RateLimitError) {
+          return { valid: false, error: 'Rate limit exceeded — try again later' };
+        }
+        return { valid: false, error: 'Network error — check your connection' };
+      }
+    },
+  );
 }

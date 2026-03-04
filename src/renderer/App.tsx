@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import Setup from './pages/Setup';
 import Collections from './pages/Collections';
 import Settings from './pages/Settings';
+import ApiKey from './pages/ApiKey';
+import About from './pages/About';
 
 type Tab = 'collections' | 'settings' | 'api-key' | 'about';
 
@@ -59,12 +61,8 @@ export function App() {
       <div className="flex-1 overflow-hidden">
         {activeTab === 'collections' && <Collections />}
         {activeTab === 'settings' && <Settings />}
-        {activeTab === 'api-key' && (
-          <div className="p-4 text-sm text-gray-500">API Key management — coming soon</div>
-        )}
-        {activeTab === 'about' && (
-          <div className="p-4 text-sm text-gray-500">About — coming soon</div>
-        )}
+        {activeTab === 'api-key' && <ApiKey />}
+        {activeTab === 'about' && <About />}
       </div>
     </div>
   );

@@ -18,6 +18,10 @@ const api: WallPaprikaAPI = {
   setHotkey: (accelerator) => ipcRenderer.invoke('set-hotkey', accelerator),
   clearHotkey: () => ipcRenderer.invoke('clear-hotkey'),
   getHotkey: () => ipcRenderer.invoke('get-hotkey'),
+  setLaunchAtLogin: (enabled) => ipcRenderer.invoke('set-launch-at-login', enabled),
+  getLaunchAtLogin: () => ipcRenderer.invoke('get-launch-at-login'),
+  getRateLimit: () => ipcRenderer.invoke('get-rate-limit'),
+  validateCurrentKey: () => ipcRenderer.invoke('validate-current-key'),
 };
 
 contextBridge.exposeInMainWorld('api', api);
