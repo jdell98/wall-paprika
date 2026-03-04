@@ -1,0 +1,15 @@
+appId: com.wallpaprika.app
+productName: Wall Paprika
+directories:
+  output: dist
+  buildResources: assets
+files:
+  - dist/main/**/*
+  - dist/preload/**/*
+  - dist/renderer/**/*
+  - assets/**/*
+mac:
+  target: dir
+  category: public.app-category.utilities
+  extendInfo:
+    LSUIElement: true
