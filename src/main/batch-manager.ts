@@ -37,22 +37,39 @@ export async function downloadImage(photo: PhotoMeta): Promise<string> {
   return filePath;
 }
 
-export async function fillBatch(): Promise<void> {
+export interface BatchFillResult {
+  attempted: number;
+  succeeded: number;
+  failed: number;
+}
+
+export async function fillBatch(): Promise<BatchFillResult> {
   ensureBatchDir();
   const currentCount = getBatchCount();
   const needed = BATCH_SIZE - currentCount;
-  if (needed <= 0) return;
+  const result: BatchFillResult = { attempted: 0, succeeded: 0, failed: 0 };
+
+  if (needed <= 0) return result;
 
   for (let i = 0; i < needed; i++) {
     const photo = pickRandomPhoto();
     if (!photo) break;
 
+    result.attempted++;
     try {
       await downloadImage(photo);
+      result.succeeded++;
     } catch (error) {
+      result.failed++;
       console.error(`[batch] Failed to download ${photo.id}:`, error);
     }
   }
+
+  if (result.attempted > 0 && result.succeeded === 0) {
+    console.error(`[batch] All ${result.failed} download(s) failed — possible network issue`);
+  }
+
+  return result;
 }
 
 export async function getNextPhoto(): Promise<{ photo: PhotoMeta; filePath: string } | null> {
@@ -91,12 +108,20 @@ export async function getNextPhoto(): Promise<{ photo: PhotoMeta; filePath: stri
 }
 
 export function deleteImage(filePath: string): void {
+  const batchDir = getBatchDir();
+  const resolved = path.resolve(filePath);
+
+  if (!resolved.startsWith(batchDir + path.sep)) {
+    console.error(`[batch] Refusing to delete file outside batch directory: ${resolved}`);
+    return;
+  }
+
   try {
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    if (fs.existsSync(resolved)) {
+      fs.unlinkSync(resolved);
     }
   } catch (error) {
-    console.error(`[batch] Failed to delete ${filePath}:`, error);
+    console.error(`[batch] Failed to delete ${resolved}:`, error);
   }
 }
 

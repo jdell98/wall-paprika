@@ -119,11 +119,47 @@ export default function ApiKey() {
 
       {/* Rate Limit */}
       {rateLimit && (
-        <div className="rounded-lg bg-gray-50 p-3">
-          <p className="text-xs font-medium text-gray-500 uppercase">API usage</p>
-          <p className="mt-1 text-sm text-gray-700">
+        <div
+          className={`rounded-lg p-3 ${
+            rateLimit.remaining === 0
+              ? 'bg-red-50'
+              : rateLimit.remaining <= 10
+                ? 'bg-amber-50'
+                : 'bg-gray-50'
+          }`}
+        >
+          <p
+            className={`text-xs font-medium uppercase ${
+              rateLimit.remaining === 0
+                ? 'text-red-500'
+                : rateLimit.remaining <= 10
+                  ? 'text-amber-500'
+                  : 'text-gray-500'
+            }`}
+          >
+            API usage
+          </p>
+          <p
+            className={`mt-1 text-sm ${
+              rateLimit.remaining === 0
+                ? 'text-red-700'
+                : rateLimit.remaining <= 10
+                  ? 'text-amber-700'
+                  : 'text-gray-700'
+            }`}
+          >
             {rateLimit.remaining} / {rateLimit.limit} requests remaining this hour
           </p>
+          {rateLimit.remaining === 0 && (
+            <p className="mt-1 text-xs text-red-600">
+              Rate limit exceeded. Requests will resume next hour.
+            </p>
+          )}
+          {rateLimit.remaining > 0 && rateLimit.remaining <= 10 && (
+            <p className="mt-1 text-xs text-amber-600">
+              Running low on API requests. Consider reducing rotation frequency.
+            </p>
+          )}
         </div>
       )}
     </div>

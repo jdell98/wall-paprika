@@ -72,6 +72,13 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(
     'add-collection',
     async (_event, url: string): Promise<{ collection?: Collection; error?: string }> => {
+      if (typeof url !== 'string' || url.length === 0) {
+        return { error: 'Collection URL is required' };
+      }
+      if (url.length > 500) {
+        return { error: 'Input too long' };
+      }
+
       const collectionId = parseCollectionUrl(url);
       if (!collectionId) {
         return { error: 'Invalid Unsplash collection URL' };
@@ -216,7 +223,6 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('next-wallpaper', async (): Promise<boolean> => {
     const success = await rotateWallpaper();
     if (success) {
-      store.set('lastRotationTimestamp', Date.now());
       updateTrayMenu();
     }
     return success;

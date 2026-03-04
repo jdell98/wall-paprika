@@ -32,6 +32,7 @@ export async function rotateWallpaper(): Promise<boolean> {
   // Update store
   store.set('currentPhoto', next.photo);
   store.set('currentWallpaperPath', next.filePath);
+  store.set('lastRotationTimestamp', Date.now());
 
   // Mark as shown
   const shown = store.get('shownPhotoIds');

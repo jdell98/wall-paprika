@@ -21,6 +21,7 @@ class ShortcutManager {
   }
 
   update(newHotkey: string | null): boolean {
+    const previousHotkey = this.currentHotkey;
     this.unregister();
 
     if (!newHotkey) {
@@ -31,6 +32,9 @@ class ShortcutManager {
     const success = this.registerKey(newHotkey);
     if (success) {
       store.set('hotkey', newHotkey);
+    } else if (previousHotkey) {
+      // Restore the previous hotkey if the new one failed
+      this.registerKey(previousHotkey);
     }
     return success;
   }
@@ -41,7 +45,6 @@ class ShortcutManager {
         rotateWallpaper()
           .then((rotated) => {
             if (rotated) {
-              store.set('lastRotationTimestamp', Date.now());
               updateTrayMenu();
             }
           })

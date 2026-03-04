@@ -80,7 +80,6 @@ class Scheduler {
     rotateWallpaper()
       .then((success) => {
         if (success) {
-          store.set('lastRotationTimestamp', Date.now());
           updateTrayMenu();
         }
       })

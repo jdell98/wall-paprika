@@ -3,5 +3,13 @@ docs/
 
 node_modules/
 dist/
+out/
+release/
 .DS_Store
 *.tsbuildinfo
+*.dmg
+*.zip
+*.app
+.env
+.env.*
+coverage/

@@ -4,6 +4,7 @@ import { store } from './store';
 import { registerIpcHandlers } from './ipc';
 import { rotateWallpaper } from './rotation';
 import { ensureBatchDir, fillBatch, getBatchCount } from './batch-manager';
+import { getRateLimit } from './unsplash';
 import { scheduler } from './scheduler';
 import { shortcutManager } from './shortcuts';
 
@@ -57,7 +58,9 @@ function buildTrayMenu(): Menu {
 
   let currentLabel: string;
   if (currentPhoto) {
-    currentLabel = `Current: "${currentPhoto.description || 'Untitled'}" by ${currentPhoto.photographerName}`;
+    const desc = currentPhoto.description || 'Untitled';
+    const full = `Current: "${desc}" by ${currentPhoto.photographerName}`;
+    currentLabel = full.length > 32 ? full.slice(0, 32) + '...' : full;
   } else if (!hasCollections) {
     currentLabel = 'Current: Add collections in Preferences';
   } else {
@@ -80,6 +83,9 @@ function buildTrayMenu(): Menu {
     });
   }
 
+  const rateLimit = getRateLimit();
+  const rateLimitLabel = `API: ${rateLimit.remaining}/${rateLimit.limit} requests left`;
+
   menuItems.push(
     { type: 'separator' },
     {
@@ -91,6 +97,11 @@ function buildTrayMenu(): Menu {
           updateTrayMenu();
         }
       },
+    },
+    { type: 'separator' },
+    {
+      label: rateLimitLabel,
+      enabled: false,
     },
     { type: 'separator' },
     {
@@ -136,14 +147,16 @@ async function onStartup(): Promise<void> {
 
   // Fill batch if low or empty
   if (getBatchCount() < 3) {
-    await fillBatch();
+    const result = await fillBatch();
+    if (result.attempted > 0 && result.succeeded === 0) {
+      console.error('[startup] Batch fill failed completely — check network');
+    }
   }
 
   // Set first wallpaper if none is currently set
   if (!store.get('currentWallpaperPath')) {
     const success = await rotateWallpaper();
     if (success) {
-      store.set('lastRotationTimestamp', Date.now());
       updateTrayMenu();
     }
   }
