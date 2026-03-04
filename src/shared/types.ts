@@ -63,6 +63,7 @@ export interface WallPaprikaAPI {
   getLaunchAtLogin: () => Promise<boolean>;
   getRateLimit: () => Promise<RateLimitInfo>;
   validateCurrentKey: () => Promise<{ valid: boolean; error?: string }>;
+  nextWallpaper: () => Promise<boolean>;
 }
 
 declare global {

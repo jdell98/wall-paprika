@@ -4,7 +4,7 @@
   "description": "Menu bar app for macOS that rotates desktop wallpapers from Unsplash collections",
   "main": "dist/main/index.js",
   "scripts": {
-    "dev": "concurrently -n main,renderer \"webpack --config webpack.config.js --env target=main --watch\" \"webpack serve --config webpack.config.js --env target=renderer\"",
+    "dev": "webpack --config webpack.config.js --env target=preload && concurrently -k -n main,renderer,electron \"webpack --config webpack.config.js --env target=main --watch\" \"webpack serve --config webpack.config.js --env target=renderer\" \"sleep 3 && NODE_ENV=development npx electron .\"",
     "build": "webpack --config webpack.config.js --env target=main && webpack --config webpack.config.js --env target=preload && webpack --config webpack.config.js --env target=renderer",
     "package": "npm run build && electron-builder",
     "lint": "eslint src/ && prettier --check src/",

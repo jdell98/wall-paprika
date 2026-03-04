@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import Setup from './pages/Setup';
 import Collections from './pages/Collections';
+import Controls from './pages/Controls';
 import Settings from './pages/Settings';
 import ApiKey from './pages/ApiKey';
 import About from './pages/About';
 
-type Tab = 'collections' | 'settings' | 'api-key' | 'about';
+type Tab = 'collections' | 'controls' | 'settings' | 'api-key' | 'about';
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'collections', label: 'Collections' },
+  { id: 'controls', label: 'Controls' },
   { id: 'settings', label: 'Settings' },
   { id: 'api-key', label: 'API Key' },
   { id: 'about', label: 'About' },
@@ -40,6 +42,9 @@ export function App() {
 
   return (
     <div className="flex h-screen flex-col">
+      {/* Titlebar drag region — accounts for hiddenInset traffic lights */}
+      <div className="h-8 shrink-0" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties} />
+
       {/* Tab bar */}
       <div className="flex border-b border-gray-200">
         {tabs.map((tab) => (
@@ -60,6 +65,7 @@ export function App() {
       {/* Tab content */}
       <div className="flex-1 overflow-hidden">
         {activeTab === 'collections' && <Collections />}
+        {activeTab === 'controls' && <Controls />}
         {activeTab === 'settings' && <Settings />}
         {activeTab === 'api-key' && <ApiKey />}
         {activeTab === 'about' && <About />}

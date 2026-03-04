@@ -22,6 +22,7 @@ const api: WallPaprikaAPI = {
   getLaunchAtLogin: () => ipcRenderer.invoke('get-launch-at-login'),
   getRateLimit: () => ipcRenderer.invoke('get-rate-limit'),
   validateCurrentKey: () => ipcRenderer.invoke('validate-current-key'),
+  nextWallpaper: () => ipcRenderer.invoke('next-wallpaper'),
 };
 
 contextBridge.exposeInMainWorld('api', api);

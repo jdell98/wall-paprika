@@ -11,6 +11,8 @@ import {
 } from './unsplash';
 import { prefetchCollectionPhotos, removeCollectionPhotos } from './photo-pool';
 import { shortcutManager } from './shortcuts';
+import { rotateWallpaper } from './rotation';
+import { updateTrayMenu } from './index';
 import type {
   Collection,
   RateLimitInfo,
@@ -210,4 +212,13 @@ export function registerIpcHandlers(): void {
       }
     },
   );
+
+  ipcMain.handle('next-wallpaper', async (): Promise<boolean> => {
+    const success = await rotateWallpaper();
+    if (success) {
+      store.set('lastRotationTimestamp', Date.now());
+      updateTrayMenu();
+    }
+    return success;
+  });
 }
