@@ -38,6 +38,10 @@ export interface WallPaprikaAPI {
   validateApiKey: (key: string) => Promise<{ valid: boolean; error?: string }>;
   setSetupComplete: () => Promise<void>;
   getSetupComplete: () => Promise<boolean>;
+  addCollection: (url: string) => Promise<{ collection?: Collection; error?: string }>;
+  removeCollection: (id: string) => Promise<void>;
+  getCollections: () => Promise<Collection[]>;
+  getTotalPhotos: () => Promise<number>;
 }
 
 declare global {

@@ -2,6 +2,8 @@ import { app, Tray, Menu, BrowserWindow, ipcMain, nativeImage, shell } from 'ele
 import path from 'node:path';
 import { store } from './store';
 import { registerIpcHandlers } from './ipc';
+import { rotateWallpaper } from './rotation';
+import { ensureBatchDir, fillBatch, getBatchCount } from './batch-manager';
 
 let tray: Tray | null = null;
 let preferencesWindow: BrowserWindow | null = null;
@@ -46,21 +48,42 @@ function createPreferencesWindow(): void {
   });
 }
 
-function createTray(): void {
-  const iconPath = path.join(__dirname, '../../assets/trayTemplate.png');
-  const icon = nativeImage.createFromPath(iconPath);
-  tray = new Tray(icon);
-  tray.setToolTip('Wall Paprika');
+function buildTrayMenu(): Menu {
+  const currentPhoto = store.get('currentPhoto');
+  const collections = store.get('collections');
+  const hasCollections = collections.length > 0;
 
-  const contextMenu = Menu.buildFromTemplate([
+  const currentLabel = currentPhoto
+    ? `Current: "${currentPhoto.description || 'Untitled'}" by ${currentPhoto.photographerName}`
+    : 'Current: No wallpaper set';
+
+  const menuItems: Electron.MenuItemConstructorOptions[] = [
     {
-      label: 'Current: No wallpaper set',
+      label: currentLabel,
       enabled: false,
     },
+  ];
+
+  if (currentPhoto) {
+    menuItems.push({
+      label: '  View on Unsplash',
+      click: () => {
+        shell.openExternal(currentPhoto.unsplashUrl);
+      },
+    });
+  }
+
+  menuItems.push(
     { type: 'separator' },
     {
       label: 'Next wallpaper',
-      enabled: false,
+      enabled: hasCollections,
+      click: async () => {
+        const success = await rotateWallpaper();
+        if (success) {
+          updateTrayMenu();
+        }
+      },
     },
     { type: 'separator' },
     {
@@ -75,9 +98,47 @@ function createTray(): void {
         app.quit();
       },
     },
-  ]);
+  );
 
-  tray.setContextMenu(contextMenu);
+  return Menu.buildFromTemplate(menuItems);
+}
+
+export function updateTrayMenu(): void {
+  if (!tray) return;
+  tray.setContextMenu(buildTrayMenu());
+}
+
+function createTray(): void {
+  const iconPath = path.join(__dirname, '../../assets/trayTemplate.png');
+  const icon = nativeImage.createFromPath(iconPath);
+  tray = new Tray(icon);
+  tray.setToolTip('Wall Paprika');
+  tray.setContextMenu(buildTrayMenu());
+}
+
+async function onStartup(): Promise<void> {
+  ensureBatchDir();
+
+  if (!store.get('setupComplete')) {
+    createPreferencesWindow();
+    return;
+  }
+
+  const collections = store.get('collections');
+  if (collections.length === 0) return;
+
+  // Fill batch if low or empty
+  if (getBatchCount() < 3) {
+    await fillBatch();
+  }
+
+  // Set first wallpaper if none is currently set
+  if (!store.get('currentWallpaperPath')) {
+    const success = await rotateWallpaper();
+    if (success) {
+      updateTrayMenu();
+    }
+  }
 }
 
 app.whenReady().then(() => {
@@ -93,9 +154,9 @@ app.whenReady().then(() => {
 
   createTray();
 
-  if (!store.get('setupComplete')) {
-    createPreferencesWindow();
-  }
+  onStartup().catch((err) => {
+    console.error('[startup] Error during initialization:', err);
+  });
 });
 
 app.on('window-all-closed', () => {

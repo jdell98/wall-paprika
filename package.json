@@ -8,7 +8,8 @@
     "build": "webpack --config webpack.config.js --env target=main && webpack --config webpack.config.js --env target=preload && webpack --config webpack.config.js --env target=renderer",
     "package": "npm run build && electron-builder",
     "lint": "eslint src/ && prettier --check src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "author": "Jack",
   "license": "MIT",

@@ -10,6 +10,7 @@ interface StoreSchema {
   launchAtLogin: boolean;
   paused: boolean;
   currentPhoto: PhotoMeta | null;
+  currentWallpaperPath: string | null;
   shownPhotoIds: string[];
   prefetchedPhotos: PhotoMeta[];
   setupComplete: boolean;
@@ -25,6 +26,7 @@ export const store = new Store<StoreSchema>({
     launchAtLogin: false,
     paused: false,
     currentPhoto: null,
+    currentWallpaperPath: null,
     shownPhotoIds: [],
     prefetchedPhotos: [],
     setupComplete: false,
