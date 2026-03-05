@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { store } from './store';
 import { pickRandomPhoto } from './photo-pool';
-import type { PhotoMeta } from '../shared/types';
+import type { Collection, PhotoMeta } from '../shared/types';
 
 const BATCH_SIZE = 10;
 
@@ -51,9 +51,14 @@ export async function fillBatch(): Promise<BatchFillResult> {
 
   if (needed <= 0) return result;
 
+  const collections: Collection[] = store.get('collections');
+  if (collections.length === 0) return result;
+
+  // Round-robin across collections to ensure even distribution
   for (let i = 0; i < needed; i++) {
-    const photo = pickRandomPhoto();
-    if (!photo) break;
+    const collection = collections[i % collections.length];
+    const photo = pickRandomPhoto(collection.id);
+    if (!photo) continue;
 
     result.attempted++;
     try {

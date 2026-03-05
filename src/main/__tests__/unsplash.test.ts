@@ -185,6 +185,7 @@ describe('getCollectionPhotos', () => {
     expect(photos).toHaveLength(1);
     expect(photos[0]).toEqual({
       id: 'photo1',
+      collectionId: 'col1',
       url: 'https://images.unsplash.com/photo-1?w=3840&q=85',
       downloadLocation: 'https://api.unsplash.com/photos/photo1/download',
       photographerName: 'Jane Doe',

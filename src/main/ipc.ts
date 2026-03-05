@@ -4,7 +4,6 @@ import {
   validateKey,
   parseCollectionUrl,
   getCollection,
-  getCollectionPhotos,
   getRateLimit,
   InvalidKeyError,
   RateLimitError,
@@ -120,25 +119,14 @@ export function registerIpcHandlers(): void {
     },
   );
 
-  ipcMain.handle('remove-collection', async (_event, collectionId: string): Promise<void> => {
+  ipcMain.handle('remove-collection', (_event, collectionId: string): void => {
     const collections = store.get('collections');
     store.set(
       'collections',
       collections.filter((c) => c.id !== collectionId),
     );
 
-    // Get photo IDs for this collection to clean up prefetched/shown lists
-    const apiKey = getApiKey();
-    if (apiKey) {
-      try {
-        const photos = await getCollectionPhotos(collectionId, 1, 30, apiKey);
-        const photoIds = new Set(photos.map((p) => p.id));
-        removeCollectionPhotos(collectionId, photoIds);
-      } catch {
-        // Best-effort cleanup; if API call fails, just remove prefetched photos
-        // that we can identify by re-checking what's left
-      }
-    }
+    removeCollectionPhotos(collectionId);
   });
 
   ipcMain.handle('get-collections', (): Collection[] => {

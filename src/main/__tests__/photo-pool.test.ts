@@ -32,9 +32,10 @@ import { getCollectionPhotos } from '../unsplash';
 
 const mockGetPhotos = vi.mocked(getCollectionPhotos);
 
-function makePhoto(id: string): PhotoMeta {
+function makePhoto(id: string, collectionId = 'col1'): PhotoMeta {
   return {
     id,
+    collectionId,
     url: `https://images.unsplash.com/${id}?w=3840&q=85`,
     downloadLocation: `https://api.unsplash.com/photos/${id}/download`,
     photographerName: 'Test',
@@ -46,6 +47,7 @@ function makePhoto(id: string): PhotoMeta {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  storeData['collections'] = [];
   storeData['prefetchedPhotos'] = [];
   storeData['shownPhotoIds'] = [];
 });
@@ -90,23 +92,27 @@ describe('prefetchCollectionPhotos', () => {
 // ──────────────────────────────────────────────
 
 describe('removeCollectionPhotos', () => {
-  it('removes matching photos from prefetched pool', () => {
-    storeData['prefetchedPhotos'] = [makePhoto('p1'), makePhoto('p2'), makePhoto('p3')];
+  it('removes photos belonging to the collection from prefetched pool', () => {
+    storeData['prefetchedPhotos'] = [
+      makePhoto('p1', 'col1'),
+      makePhoto('p2', 'col2'),
+      makePhoto('p3', 'col1'),
+    ];
     storeData['shownPhotoIds'] = ['p1', 'p2'];
 
-    removeCollectionPhotos('col1', new Set(['p1', 'p3']));
+    removeCollectionPhotos('col1');
 
     const pool = storeData['prefetchedPhotos'] as PhotoMeta[];
     expect(pool.map((p) => p.id)).toEqual(['p2']);
   });
 
   it('removes matching IDs from shown list', () => {
-    storeData['prefetchedPhotos'] = [makePhoto('p1'), makePhoto('p2')];
+    storeData['prefetchedPhotos'] = [makePhoto('p1', 'col1'), makePhoto('p2', 'col1')];
     storeData['shownPhotoIds'] = ['p1', 'p2', 'p3'];
 
-    removeCollectionPhotos('col1', new Set(['p2', 'p3']));
+    removeCollectionPhotos('col1');
 
-    expect(storeData['shownPhotoIds']).toEqual(['p1']);
+    expect(storeData['shownPhotoIds']).toEqual(['p3']);
   });
 });
 
@@ -137,15 +143,15 @@ describe('pickRandomPhoto', () => {
     expect(photo!.id).toBe('p2');
   });
 
-  it('resets shown list when all photos have been shown', () => {
+  it('picks from full pool when all photos have been shown', () => {
     storeData['prefetchedPhotos'] = [makePhoto('p1'), makePhoto('p2')];
     storeData['shownPhotoIds'] = ['p1', 'p2'];
 
     const photo = pickRandomPhoto();
 
     expect(photo).not.toBeNull();
-    // After reset, shown list should contain only the newly picked photo
-    expect(storeData['shownPhotoIds']).toEqual([photo!.id]);
+    // Appends the pick to the existing shown list
+    expect(storeData['shownPhotoIds']).toContain(photo!.id);
   });
 
   it('adds picked photo to shown list', () => {
@@ -159,7 +165,7 @@ describe('pickRandomPhoto', () => {
 
   it('cycles through all photos before repeating', () => {
     const ids = ['a', 'b', 'c'];
-    storeData['prefetchedPhotos'] = ids.map(makePhoto);
+    storeData['prefetchedPhotos'] = ids.map((id) => makePhoto(id));
     storeData['shownPhotoIds'] = [];
 
     const picked = new Set<string>();
@@ -171,5 +177,52 @@ describe('pickRandomPhoto', () => {
     }
 
     expect(picked).toEqual(new Set(ids));
+  });
+
+  it('filters by collectionId when provided', () => {
+    storeData['prefetchedPhotos'] = [
+      makePhoto('p1', 'col1'),
+      makePhoto('p2', 'col2'),
+      makePhoto('p3', 'col1'),
+    ];
+
+    const photo = pickRandomPhoto('col2');
+
+    expect(photo).not.toBeNull();
+    expect(photo!.id).toBe('p2');
+  });
+
+  it('returns null when collection has no photos in pool', () => {
+    storeData['prefetchedPhotos'] = [makePhoto('p1', 'col1')];
+
+    const photo = pickRandomPhoto('col2');
+
+    expect(photo).toBeNull();
+  });
+
+  it('skips shown photos within collection filter', () => {
+    storeData['prefetchedPhotos'] = [
+      makePhoto('p1', 'col1'),
+      makePhoto('p2', 'col1'),
+      makePhoto('p3', 'col2'),
+    ];
+    storeData['shownPhotoIds'] = ['p1'];
+
+    const photo = pickRandomPhoto('col1');
+
+    expect(photo!.id).toBe('p2');
+  });
+
+  it('picks from full collection subset when all its photos are shown', () => {
+    storeData['prefetchedPhotos'] = [
+      makePhoto('p1', 'col1'),
+      makePhoto('p2', 'col2'),
+    ];
+    storeData['shownPhotoIds'] = ['p1'];
+
+    const photo = pickRandomPhoto('col1');
+
+    expect(photo).not.toBeNull();
+    expect(photo!.id).toBe('p1');
   });
 });

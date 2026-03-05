@@ -7,6 +7,7 @@ export interface Collection {
 
 export interface PhotoMeta {
   id: string;
+  collectionId: string;
   url: string;
   downloadLocation: string;
   photographerName: string;

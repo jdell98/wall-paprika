@@ -149,6 +149,7 @@ export async function getCollectionPhotos(
   return (data as Record<string, unknown>[]).map(
     (photo: Record<string, unknown>): PhotoMeta => ({
       id: photo.id as string,
+      collectionId,
       url: `${(photo.urls as Record<string, string>).raw}?w=3840&q=85`,
       downloadLocation: (photo.links as Record<string, string>).download_location,
       photographerName: (photo.user as Record<string, string>).name,

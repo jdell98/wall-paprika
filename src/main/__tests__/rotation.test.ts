@@ -52,6 +52,7 @@ import { getApiKey } from '../store';
 function makePhoto(id: string): PhotoMeta {
   return {
     id,
+    collectionId: 'col1',
     url: `https://images.unsplash.com/${id}?w=3840&q=85`,
     downloadLocation: `https://api.unsplash.com/photos/${id}/download`,
     photographerName: 'Test',
