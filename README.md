@@ -4,6 +4,8 @@
 
 # Wall Paprika
 
+*Spice up your wallpaper!*
+
 A lightweight menu bar app for macOS that automatically rotates your desktop wallpaper using high-resolution photos from [Unsplash](https://unsplash.com) collections. A free, open-source alternative to [Irvue](https://apps.apple.com/us/app/irvue-desktop-wallpapers/id1039633667?mt=12).
 
 ## Features
