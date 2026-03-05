@@ -9,7 +9,9 @@ files:
   - dist/renderer/**/*
   - assets/**/*
 mac:
-  target: dir
+  target:
+    - dir
+    - zip
   category: public.app-category.utilities
   extendInfo:
     LSUIElement: true

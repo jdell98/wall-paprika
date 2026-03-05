@@ -22,9 +22,18 @@ A lightweight menu bar app for macOS that automatically rotates your desktop wal
 ## Prerequisites
 
 - macOS 13+
-- [Node.js](https://nodejs.org/) v18+ and npm (for building only — not needed at runtime)
 
 ## Installation
+
+### Download (recommended)
+
+1. Go to the [latest release](https://github.com/jdell98/wall-paprika/releases/latest)
+2. Download the `.zip` file
+3. Extract it and drag `Wall Paprika.app` to `/Applications`
+
+### Build from source
+
+Requires [Node.js](https://nodejs.org/) v18+ and npm.
 
 ```bash
 # 1. Clone the repo
@@ -40,7 +49,7 @@ npm run package
 cp -r dist/mac-arm64/Wall\ Paprika.app /Applications/
 ```
 
-Then launch **Wall Paprika** from Applications or Spotlight. After initial setup, the app lives in your menu bar.
+Launch **Wall Paprika** from Applications or Spotlight. After initial setup, the app lives in your menu bar.
 
 ### Bypassing Gatekeeper
 
