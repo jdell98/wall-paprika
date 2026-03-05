@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "webpack --config webpack.config.js --env target=preload && concurrently -k -n main,renderer,electron \"webpack --config webpack.config.js --env target=main --watch\" \"webpack serve --config webpack.config.js --env target=renderer\" \"sleep 3 && NODE_ENV=development npx electron .\"",
     "build": "webpack --config webpack.config.js --env target=main && webpack --config webpack.config.js --env target=preload && webpack --config webpack.config.js --env target=renderer",
-    "package": "npm run build && electron-builder",
+    "build:prod": "webpack --config webpack.config.js --env target=main --env production && webpack --config webpack.config.js --env target=preload --env production && webpack --config webpack.config.js --env target=renderer --env production",
+    "package": "npm run build:prod && electron-builder",
     "lint": "eslint src/ && prettier --check src/",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

@@ -34,9 +34,6 @@ module.exports = (env) => {
       path: path.resolve(__dirname, 'dist/main'),
       filename: 'index.js',
     },
-    externals: {
-      'electron-store': 'commonjs electron-store',
-    },
   };
 
   const preloadConfig = {

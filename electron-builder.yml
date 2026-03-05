@@ -9,6 +9,7 @@ files:
   - dist/renderer/**/*
   - assets/**/*
 mac:
+  icon: assets/icon.icns
   target:
     - dir
     - zip
