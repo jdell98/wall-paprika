@@ -27,6 +27,8 @@ A lightweight menu bar app for macOS that automatically rotates your desktop wal
 
 ### Download (recommended)
 
+> **Note:** The pre-built `.zip` is for macOS on Apple Silicon (M1/M2/M3/M4) only. Intel Mac users should build from source.
+
 1. Go to the [latest release](https://github.com/jdell98/wall-paprika/releases/latest)
 2. Download the `.zip` file
 3. Extract it and drag `Wall Paprika.app` to `/Applications`
