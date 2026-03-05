@@ -55,8 +55,18 @@ Launch **Wall Paprika** from Applications or Spotlight. After initial setup, the
 
 ### Bypassing Gatekeeper
 
-The app is unsigned, so macOS will block it on first launch. To open it:
+The app is unsigned, so macOS will block it on first launch. Use one of these methods:
 
+**Option A — Terminal (recommended):**
+```bash
+xattr -cr /Applications/Wall\ Paprika.app
+```
+
+**Option B — System Settings:**
+1. Go to **System Settings → Privacy & Security**
+2. Find the "Wall Paprika" blocked message and click **Open Anyway**
+
+**Option C — Right-click:**
 1. Right-click (or Control-click) `Wall Paprika.app` in `/Applications`
 2. Select **Open** from the context menu
 3. Click **Open** in the confirmation dialog
