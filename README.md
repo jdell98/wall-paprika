@@ -26,7 +26,7 @@ A lightweight menu bar app for macOS that automatically rotates your desktop wal
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/<owner>/wall-paprika.git
+git clone https://github.com/jdell98/wall-paprika.git
 
 # 2. Install dependencies
 cd wall-paprika && npm install

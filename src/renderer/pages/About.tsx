@@ -19,7 +19,7 @@ export default function About() {
       </p>
       <div className="space-y-2 text-sm">
         <button
-          onClick={() => window.open('https://github.com/jackdell/wall-paprika', '_blank')}
+          onClick={() => window.open('https://github.com/jdell98/wall-paprika', '_blank')}
           className="block text-orange-600 hover:text-orange-700"
         >
           GitHub Repository
