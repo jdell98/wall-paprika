@@ -43,6 +43,13 @@ export interface RateLimitInfo {
   limit: number;
 }
 
+export interface LogEntry {
+  timestamp: string;
+  level: 'error' | 'warn';
+  source: string;
+  message: string;
+}
+
 export interface WallPaprikaAPI {
   getAppVersion: () => Promise<string>;
   getSettings: () => Promise<Settings>;
@@ -65,6 +72,9 @@ export interface WallPaprikaAPI {
   getRateLimit: () => Promise<RateLimitInfo>;
   validateCurrentKey: () => Promise<{ valid: boolean; error?: string }>;
   nextWallpaper: () => Promise<boolean>;
+  getLogs: () => Promise<LogEntry[]>;
+  onLogEntry: (callback: (entry: LogEntry) => void) => void;
+  removeLogListener: () => void;
 }
 
 declare global {

@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { WallPaprikaAPI } from './shared/types';
+import type { LogEntry, WallPaprikaAPI } from './shared/types';
 
 const api: WallPaprikaAPI = {
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
@@ -23,6 +23,13 @@ const api: WallPaprikaAPI = {
   getRateLimit: () => ipcRenderer.invoke('get-rate-limit'),
   validateCurrentKey: () => ipcRenderer.invoke('validate-current-key'),
   nextWallpaper: () => ipcRenderer.invoke('next-wallpaper'),
+  getLogs: () => ipcRenderer.invoke('get-logs'),
+  onLogEntry: (callback: (entry: LogEntry) => void) => {
+    ipcRenderer.on('log-entry', (_event, entry: LogEntry) => callback(entry));
+  },
+  removeLogListener: () => {
+    ipcRenderer.removeAllListeners('log-entry');
+  },
 };
 
 contextBridge.exposeInMainWorld('api', api);

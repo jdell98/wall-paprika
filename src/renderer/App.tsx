@@ -5,8 +5,9 @@ import Controls from './pages/Controls';
 import Settings from './pages/Settings';
 import ApiKey from './pages/ApiKey';
 import About from './pages/About';
+import Logs from './pages/Logs';
 
-type Tab = 'collections' | 'controls' | 'settings' | 'api-key' | 'about';
+type Tab = 'collections' | 'controls' | 'settings' | 'api-key' | 'about' | 'logs';
 
 const tabs: { id: Tab; label: string }[] = [
   { id: 'collections', label: 'Collections' },
@@ -14,6 +15,7 @@ const tabs: { id: Tab; label: string }[] = [
   { id: 'settings', label: 'Settings' },
   { id: 'api-key', label: 'API Key' },
   { id: 'about', label: 'About' },
+  { id: 'logs', label: 'Logs' },
 ];
 
 export function App() {
@@ -69,6 +71,7 @@ export function App() {
         {activeTab === 'settings' && <Settings />}
         {activeTab === 'api-key' && <ApiKey />}
         {activeTab === 'about' && <About />}
+        {activeTab === 'logs' && <Logs />}
       </div>
     </div>
   );

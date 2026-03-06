@@ -7,6 +7,7 @@ import { ensureBatchDir, fillBatch, getBatchCount } from './batch-manager';
 import { getRateLimit } from './unsplash';
 import { scheduler } from './scheduler';
 import { shortcutManager } from './shortcuts';
+import { initLogger } from './logger';
 
 let tray: Tray | null = null;
 let preferencesWindow: BrowserWindow | null = null;
@@ -187,6 +188,8 @@ async function onStartup(): Promise<void> {
 }
 
 app.whenReady().then(() => {
+  initLogger();
+
   if (process.platform === 'darwin') {
     app.dock.hide();
   }

@@ -1,5 +1,6 @@
 import { app, ipcMain } from 'electron';
 import { store, getApiKey, setApiKey, getMaskedApiKey } from './store';
+import { getBufferedLogs } from './logger';
 import {
   validateKey,
   parseCollectionUrl,
@@ -14,6 +15,7 @@ import { rotateWallpaper } from './rotation';
 import { updateTrayMenu } from './index';
 import type {
   Collection,
+  LogEntry,
   RateLimitInfo,
   RotationInterval,
   RotationStatus,
@@ -207,6 +209,10 @@ export function registerIpcHandlers(): void {
       }
     },
   );
+
+  ipcMain.handle('get-logs', (): LogEntry[] => {
+    return getBufferedLogs();
+  });
 
   ipcMain.handle('next-wallpaper', async (): Promise<boolean> => {
     const success = await rotateWallpaper();

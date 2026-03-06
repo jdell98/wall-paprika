@@ -1,6 +1,6 @@
 {
   "name": "wall-paprika",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Menu bar app for macOS that rotates desktop wallpapers from Unsplash collections",
   "main": "dist/main/index.js",
   "scripts": {

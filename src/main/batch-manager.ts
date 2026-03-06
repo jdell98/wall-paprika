@@ -55,18 +55,22 @@ export async function fillBatch(): Promise<BatchFillResult> {
   if (collections.length === 0) return result;
 
   // Round-robin across collections to ensure even distribution
+  const photos: PhotoMeta[] = [];
   for (let i = 0; i < needed; i++) {
     const collection = collections[i % collections.length];
     const photo = pickRandomPhoto(collection.id);
-    if (!photo) continue;
+    if (photo) photos.push(photo);
+  }
 
-    result.attempted++;
-    try {
-      await downloadImage(photo);
+  result.attempted = photos.length;
+
+  const outcomes = await Promise.allSettled(photos.map((photo) => downloadImage(photo)));
+  for (const [i, outcome] of outcomes.entries()) {
+    if (outcome.status === 'fulfilled') {
       result.succeeded++;
-    } catch (error) {
+    } else {
       result.failed++;
-      console.error(`[batch] Failed to download ${photo.id}:`, error);
+      console.error(`[batch] Failed to download ${photos[i].id}:`, outcome.reason);
     }
   }
 
